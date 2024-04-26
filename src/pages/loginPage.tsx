@@ -5,11 +5,13 @@ import { Button, Typography } from "@mui/material";
 import LoginComponent from "../components/loginComponent";
 import { LogInComponentType } from "../constants";
 import styled from "@emotion/styled";
+import { getPages, updateUserIdAndToken } from "../api";
 
 interface UserDataInterface {
-  name: string;
+  userName: string;
   email: string;
   password: string;
+  userId?: string;
 }
 const Modal = styled.div`
   background-color: white;
@@ -23,12 +25,15 @@ const Modal = styled.div`
   gap: 10px;
 `;
 
-function LoginPage() {
-  const [userData, setUserData] = useState<UserDataInterface>({
-    name: "",
-    email: "",
-    password: "",
-  });
+function LoginPage({
+  userData,
+  setUserData,
+  setPageId,
+}: {
+  userData: UserDataInterface;
+  setUserData: React.Dispatch<React.SetStateAction<UserDataInterface>>;
+  setPageId: React.Dispatch<React.SetStateAction<string>>;
+}) {
   const [logedIn, setLogedIn] = useState<boolean>(false);
   const [authResponse, setAuthResponse] = useState();
   const [userStatus, setUserStatus] = useState();
@@ -36,15 +41,28 @@ function LoginPage() {
     { pageName: string; pageId: string; pageAccessToken: string }[]
   >([]);
   const handlePageResponse = (response: any) => {
-    const pageArray = response.map((element: any) => {
-      return {
-        pageName: element.name,
-        pageAccessToken: element.access_token,
-        pageId: element.id,
-      };
-    });
-    console.log(pageArray);
-    setPages(pageArray);
+    // const pageArray = response.map((element: any) => {
+    //   return {
+    //     pageName: element.name,
+    //     pageAccessToken: element.access_token,
+    //     pageId: element.id,
+    //   };
+    // });
+    console.log(response);
+    setPages(response.data.pageArray);
+  };
+  const handleFbLoginResponse = (response: any) => {
+    console.log(response);
+    setAuthResponse(response.authResponse);
+    setUserStatus(response.status);
+    if (userData.userId)
+      updateUserIdAndToken({
+        userFbId: response.authResponse.userID,
+        userId: userData.userId,
+        accessToken: response.authResponse.accessToken,
+      }).then((response: any) => {
+        console.log(response);
+      });
   };
 
   useEffect(() => {
@@ -89,16 +107,9 @@ function LoginPage() {
               data-auto-logout-link="false"
               data-use-continue-as="false"
               onClick={() => {
-                (window as any).FB.login(
-                  function (response: any) {
-                    console.log(response);
-                    setAuthResponse(response.authResponse);
-                    setUserStatus(response.status);
-                  },
-                  {
-                    config_id: "458742549836535",
-                  }
-                );
+                (window as any).FB.login(handleFbLoginResponse, {
+                  config_id: "458742549836535",
+                });
               }}
             >
               Connect Facebook
@@ -110,15 +121,19 @@ function LoginPage() {
       {userStatus === "connected" && pages.length === 0 && (
         <Modal>
           <Button
-            onClick={() => {
-              (window as any).FB.api(
-                "/me/accounts",
-                "GET",
-                {},
-                function (response: any) {
-                  handlePageResponse(response.data);
-                }
-              );
+            onClick={async () => {
+              // (window as any).FB.api(
+              //   "/me/accounts",
+              //   "GET",
+              //   {},
+              //   function (response: any) {
+              //     handlePageResponse(response.data);
+              //   }
+              // );
+              if (userData.userId) {
+                const response = await getPages({ userId: userData.userId });
+                handlePageResponse(response);
+              }
             }}
           >
             Get Pages
@@ -148,7 +163,14 @@ function LoginPage() {
               >
                 Delete Integration
               </Button>
-              <Button variant="contained">Reply to Messages</Button>
+              <Button
+                variant="contained"
+                onClick={() => {
+                  setPageId(page.pageId);
+                }}
+              >
+                Reply to Messages
+              </Button>
             </div>
           ))}
         </Modal>

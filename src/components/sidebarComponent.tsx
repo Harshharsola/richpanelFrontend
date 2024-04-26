@@ -19,11 +19,16 @@ const IconContainer = styled.div<{ $selected?: boolean }>`
   background-color: ${(props) => props.$selected && "white"};
 `;
 
-function Sidebar() {
+function Sidebar(props: {
+  setSelectedPanel: React.Dispatch<React.SetStateAction<string | undefined>>;
+}) {
   const [selected, setSelected] = useState<string>();
 
   const iconClickHandler = (selection: string) => {
-    if (selection !== selected) setSelected(selection);
+    if (selection !== selected) {
+      setSelected(selection);
+      props.setSelectedPanel(selection);
+    }
   };
   return (
     <Wrapper>

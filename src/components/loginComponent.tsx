@@ -4,11 +4,13 @@ import Checkbox from "@mui/material/Checkbox";
 import { Button, Typography } from "@mui/material";
 import { LogInComponentType } from "../constants";
 import styled from "@emotion/styled";
+import { signUpApi } from "../api";
 
 interface UserDataInterface {
-  name: string;
+  userName: string;
   email: string;
   password: string;
+  userId?: string;
 }
 
 interface Iprops {
@@ -34,19 +36,22 @@ function LoginComponent(props: Iprops) {
   const [componentType, setComponentType] = useState<
     LogInComponentType.LOG_IN | LogInComponentType.SIGN_UP
   >(props.componentType);
+  const [userData, setUserData] = useState<UserDataInterface>(props.userData);
   const handleInputChange = (event: any) => {
     let data = {
-      ...props.userData,
+      ...userData,
       [event.target.name]: event.target.value,
     };
-    props.setUserData(data);
+    setUserData(data);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (
-      Object.values(props.userData).filter((value) => value.length === 0)
-        .length === 0
+      Object.values(userData).filter((value) => value.length === 0).length === 0
     ) {
+      const response = await signUpApi(userData);
+      console.log(response);
+      props.setUserData({ ...userData, userId: (response as any).id });
       props.setLoggedIn(true);
       //apiCall
     } else {
@@ -96,7 +101,7 @@ function LoginComponent(props: Iprops) {
               <Typography>Name</Typography>
               <input
                 style={{ height: "30px" }}
-                name="name"
+                name="userName"
                 onChange={handleInputChange}
               ></input>
             </div>
