@@ -38,7 +38,12 @@ function LoginPage({
   const [authResponse, setAuthResponse] = useState();
   const [userStatus, setUserStatus] = useState();
   const [pages, setPages] = useState<
-    { pageName: string; pageId: string; pageAccessToken: string }[]
+    {
+      pageName: string;
+      fbPageId: string;
+      pageAccessToken: string;
+      _id: string;
+    }[]
   >([]);
   const handlePageResponse = (response: any) => {
     // const pageArray = response.map((element: any) => {
@@ -166,7 +171,7 @@ function LoginPage({
               <Button
                 variant="contained"
                 onClick={() => {
-                  setPageId(page.pageId);
+                  setPageId(page._id);
                 }}
               >
                 Reply to Messages

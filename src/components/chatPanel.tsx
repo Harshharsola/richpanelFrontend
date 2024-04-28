@@ -3,7 +3,8 @@ import { Input, TextField, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import InboxIcon from "../assests/inbox.svg";
 import { io } from "socket.io-client";
-const socket = io("http://localhost:3000");
+import SocketManager from "../socket/socketManager";
+// const socket = io("http://localhost:3000");
 const Wrapper = styled.div`
   height: 100vh;
   background-color: #f6f6f7;
@@ -51,7 +52,7 @@ const Message = styled.div`
   box-shadow: 1px 1px 2px gray;
 `;
 
-const messageArray = [
+const messages = [
   { text: "hi hello", senderId: "234" },
   { text: "hi hello", senderId: "234" },
   { text: "hi hello", userId: "23" },
@@ -81,21 +82,41 @@ function ChatPanel(props: {
   name: string;
   conversationId: string;
   userId: string;
+  pageId: string;
+  recipientId: string;
 }) {
   const [newMessage, setNewMessage] = useState<string>("");
-  const [messages, setMessages] = useState<any>([]);
-  useEffect(() => {
-    socket.on("pong", (message) => {
-      console.log(message);
-      setMessages([...messages, message]);
-    });
-  }, [messages]);
+  const [messages, setMessages] = useState<
+    { messageContent: string; senderId: string }[]
+  >([]);
 
   useEffect(() => {
+    const socket = SocketManager.getInstance();
+    socket.on(
+      "pong",
+      (message: { messageContent: string; senderId: string }) => {
+        console.log(message);
+        setMessages((prevMessages) => [...prevMessages, message]);
+      }
+    );
+
     socket.emit("identify", props.userId);
+    return () => {
+      socket.off("pong");
+    };
   }, []);
+
   const sendMessage = () => {
-    socket.emit("ping", newMessage);
+    const socket = SocketManager.getInstance();
+    const message = { messageContent: newMessage, senderId: props.pageId };
+    setMessages((prevMessages) => [...prevMessages, message]);
+    const msgData = {
+      conversationId: props.conversationId,
+      pageId: props.pageId,
+      recipientId: props.recipientId,
+      message: newMessage,
+    };
+    socket.emit("ping", msgData);
     setNewMessage("");
   };
   return (
@@ -106,20 +127,21 @@ function ChatPanel(props: {
         </Typography>
       </Header>
       <ChatBody>
-        {messageArray.map((message, index) => {
+        {messages.map((message, index) => {
           let showImage = true;
           if (
-            messageArray[index + 1] &&
-            messageArray[index + 1].senderId === message.senderId
+            messages[index + 1] &&
+            messages[index + 1].senderId === message.senderId
           ) {
             showImage = false;
           }
           return (
             <MessageComponent
               $showImage={showImage}
-              $messageType={typeof message.senderId === "undefined"}
+              $messageType={message.senderId === props.pageId}
             >
-              {showImage && <InboxIcon />} <Message>{message.text}</Message>
+              {showImage && <InboxIcon />}{" "}
+              <Message>{message.messageContent}</Message>
             </MessageComponent>
           );
         })}

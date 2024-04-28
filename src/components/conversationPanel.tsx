@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import { Typography } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
+import { conversations } from "../constants";
 const Wrapper = styled.div`
   height: 100vh;
   background-color: white;
@@ -33,26 +34,32 @@ const ConversationCard = styled.div`
 const mockConversationArray = [
   {
     name: "Harsh harsola",
-    message: " Hi hello wassup",
-    conversationId: "12346i",
+    email: " Hi hello wassup",
+    recipientId: "12346i",
   },
   {
     name: "Yamini harsola",
-    message: " Hi hello wassup",
-    conversationId: "asdf",
+    email: " Hi hello wassup",
+    recipientId: "asdf",
   },
   {
     name: "Dk harsola",
-    message: " Hi hello wassup",
-    conversationId: "34",
+    email: " Hi hello wassup",
+    recipientId: "34",
   },
   {
     name: "Shobhana harsola",
-    message: " Hi hello wassup",
-    conversationId: "jhgf",
+    email: " Hi hello wassup",
+    recipientId: "jhgf",
   },
 ];
-function ConversationsPanel() {
+function ConversationsPanel(props: {
+  conversations: conversations[];
+  setRecipientId: React.Dispatch<React.SetStateAction<number>>;
+}) {
+  const handleConversationSelection = (index: number) => {
+    props.setRecipientId(index);
+  };
   return (
     <Wrapper>
       <Header>
@@ -60,14 +67,19 @@ function ConversationsPanel() {
           Conversations
         </Typography>
       </Header>
-      {mockConversationArray.map((chat) => {
+      {props.conversations.map((chat, index) => {
         return (
-          <ConversationCard key={chat.conversationId}>
+          <ConversationCard
+            key={chat.id}
+            onClick={() => {
+              handleConversationSelection(index);
+            }}
+          >
             <Typography variant="h5" fontWeight={400}>
               {chat.name}
             </Typography>
             <Typography variant="body2" fontWeight={400}>
-              {chat.message}
+              {chat.email}
             </Typography>
           </ConversationCard>
         );

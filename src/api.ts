@@ -61,3 +61,13 @@ export const connectPage = async () => {
 
   return response.json();
 };
+
+export const getConversations = async (payload: { pageId: string }) => {
+  console.log(payload);
+
+  const response = await fetch(
+    "http://localhost:3000/conversations?pageId=" + payload.pageId
+  );
+
+  return response.json();
+};
