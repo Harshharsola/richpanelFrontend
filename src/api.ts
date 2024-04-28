@@ -22,6 +22,26 @@ export const signUpApi = async (payload: {
   return response.json();
 };
 
+export const logInApi = async (payload: {
+  email: string;
+  password: string;
+}) => {
+  const raw = JSON.stringify(payload);
+
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+  };
+
+  const response = await fetch(
+    "http://localhost:3000/users/login",
+    requestOptions
+  );
+
+  return response.json();
+};
+
 export const updateUserIdAndToken = async (payload: {
   userId: string;
   userFbId: string;
@@ -40,7 +60,7 @@ export const updateUserIdAndToken = async (payload: {
     requestOptions
   );
 
-  return response.text();
+  return response.json();
 };
 
 export const getPages = async (payload: { userId: string }) => {
@@ -69,5 +89,12 @@ export const getConversations = async (payload: { pageId: string }) => {
     "http://localhost:3000/conversations?pageId=" + payload.pageId
   );
 
+  return response.json();
+};
+
+export const deletePage = async (id: string) => {
+  const response = await fetch("http://localhost:3000/pages/delete?id=" + id, {
+    method: "DELETE",
+  });
   return response.json();
 };

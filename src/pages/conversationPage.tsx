@@ -5,6 +5,7 @@ import ConversationsPanel from "../components/conversationPanel";
 import ChatPanel from "../components/chatPanel";
 import { connectPage, getConversations } from "../api";
 import { conversations } from "../constants";
+import toast from "react-hot-toast";
 
 const Page = styled.div`
   background-color: white;
@@ -18,7 +19,7 @@ interface Iprops {
 }
 
 function ConversationPage(props: Iprops) {
-  const [selectedPanel, setSelectedPanel] = useState<string>();
+  const [selectedPanel, setSelectedPanel] = useState<string>("inbox");
   const [conversations, setConversations] = useState<conversations[]>([]);
   const [recipientId, setRecipientId] = useState<number>(0);
   const [loading, setLoading] = useState(true);
@@ -28,29 +29,31 @@ function ConversationPage(props: Iprops) {
     setLoading(true);
     connectPage();
     getConversations({ pageId: props.pageId }).then((response: any) => {
-      if (response.data.length > 0) {
+      if (response.data.length === 0) {
+        toast.error("no conversations found");
+      } else {
+        let conversationsData = response.data.map((ele: any) => ({
+          ...ele.participants.data[0],
+          conversationId: ele.id,
+        }));
         setNoConversations(false);
+        setConversations(conversationsData);
+        setLoading(false);
       }
-      let conversationsData = response.data.map((ele: any) => ({
-        ...ele.participants.data[0],
-        conversationId: ele.id,
-      }));
-      setConversations(conversationsData);
-      setLoading(false);
     });
   }, []);
 
   useEffect(() => {}, [recipientId]);
   return (
     <Page>
-      <Sidebar setSelectedPanel={setSelectedPanel} />
-      {!loading && !noConversations && (
+      <Sidebar setSelectedPanel={setSelectedPanel} selected={selectedPanel} />
+      {!loading && !noConversations && selectedPanel === "inbox" && (
         <ConversationsPanel
           conversations={conversations}
           setRecipientId={setRecipientId}
         />
       )}
-      {!loading && !noConversations && (
+      {!loading && !noConversations && selectedPanel === "inbox" && (
         <ChatPanel
           pageId={props.pageId}
           name={conversations[recipientId].name}
@@ -64,13 +67,3 @@ function ConversationPage(props: Iprops) {
 }
 
 export default ConversationPage;
-/*
-FB.api(
-  '/t_2598704216954759/messages',
-  'GET',
-  {"fields":"from,message"},
-  function(response) {
-      // Insert your code here
-  }
-);
-*/

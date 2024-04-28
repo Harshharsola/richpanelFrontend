@@ -20,9 +20,10 @@ const IconContainer = styled.div<{ $selected?: boolean }>`
 `;
 
 function Sidebar(props: {
-  setSelectedPanel: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setSelectedPanel: React.Dispatch<React.SetStateAction<string>>;
+  selected: string;
 }) {
-  const [selected, setSelected] = useState<string>();
+  const [selected, setSelected] = useState<string>(props.selected);
 
   const iconClickHandler = (selection: string) => {
     if (selection !== selected) {

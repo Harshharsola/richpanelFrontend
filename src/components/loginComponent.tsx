@@ -4,10 +4,10 @@ import Checkbox from "@mui/material/Checkbox";
 import { Button, Typography } from "@mui/material";
 import { LogInComponentType } from "../constants";
 import styled from "@emotion/styled";
-import { signUpApi } from "../api";
-
+import toast, { useToasterStore } from "react-hot-toast";
+import { logInApi, signUpApi } from "../api";
 interface UserDataInterface {
-  userName: string;
+  userName?: string;
   email: string;
   password: string;
   userId?: string;
@@ -37,6 +37,8 @@ function LoginComponent(props: Iprops) {
     LogInComponentType.LOG_IN | LogInComponentType.SIGN_UP
   >(props.componentType);
   const [userData, setUserData] = useState<UserDataInterface>(props.userData);
+  const [errorMsg, setErrorMsg] = useState<string>();
+  const { toasts, pausedAt } = useToasterStore();
   const handleInputChange = (event: any) => {
     let data = {
       ...userData,
@@ -46,19 +48,35 @@ function LoginComponent(props: Iprops) {
   };
 
   const handleSubmit = async () => {
-    if (
-      Object.values(userData).filter((value) => value.length === 0).length === 0
-    ) {
-      const response = await signUpApi(userData);
-      console.log(response);
-      props.setUserData({ ...userData, userId: (response as any).id });
-      props.setLoggedIn(true);
-      //apiCall
+    let response;
+    if (componentType === LogInComponentType.SIGN_UP) {
+      if (
+        Object.values(userData).filter((value) => value.length === 0).length ===
+        0
+      ) {
+        if (userData.userName)
+          response = await signUpApi({
+            userName: userData.userName,
+            email: userData.email,
+            password: userData.password,
+          });
+      } else {
+        toast.error("Missing fields");
+      }
     } else {
-      //show missing fields
+      response = await logInApi(userData);
+    }
+
+    console.log(response);
+    if (response) {
+      if (response.status === "200") {
+        props.setUserData({ ...userData, userId: response.data._id });
+        props.setLoggedIn(true);
+      } else {
+        toast.error(response.message);
+      }
     }
   };
-  useEffect(() => {}, []);
 
   return (
     <div
@@ -143,6 +161,9 @@ function LoginComponent(props: Iprops) {
               style={{ height: "16px", padding: "0px", width: "16px" }}
             />{" "}
             <Typography>Remember me</Typography>
+            {typeof errorMsg !== "undefined" && (
+              <Typography>{errorMsg}</Typography>
+            )}
           </div>
 
           <Button

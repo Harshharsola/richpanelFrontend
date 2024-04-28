@@ -3,8 +3,12 @@ import logo from "./logo.svg";
 import "./App.css";
 import LoginPage from "./pages/loginPage";
 import ConversationPage from "./pages/conversationPage";
+
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Toaster } from "react-hot-toast";
 interface UserDataInterface {
-  userName: string;
+  userName?: string;
   email: string;
   password: string;
   userId?: string;
@@ -31,6 +35,7 @@ function App() {
           <ConversationPage pageId={pageId} userId={userData.userId} />
         )
       )}
+      <Toaster />
     </div>
   );
 }

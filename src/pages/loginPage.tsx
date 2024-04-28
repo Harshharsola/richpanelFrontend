@@ -5,10 +5,12 @@ import { Button, Typography } from "@mui/material";
 import LoginComponent from "../components/loginComponent";
 import { LogInComponentType } from "../constants";
 import styled from "@emotion/styled";
-import { getPages, updateUserIdAndToken } from "../api";
+import { deletePage, getPages, updateUserIdAndToken } from "../api";
+import toast from "react-hot-toast";
+import GetPagesComponent from "../components/getPagesComponen";
 
 interface UserDataInterface {
-  userName: string;
+  userName?: string;
   email: string;
   password: string;
   userId?: string;
@@ -23,6 +25,16 @@ const Modal = styled.div`
   flex-direction: column;
   padding: 1.5%;
   gap: 10px;
+`;
+const Page = styled.div`
+  background-color: #1f4d90;
+  height: 100vh;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 `;
 
 function LoginPage({
@@ -46,15 +58,15 @@ function LoginPage({
     }[]
   >([]);
   const handlePageResponse = (response: any) => {
-    // const pageArray = response.map((element: any) => {
-    //   return {
-    //     pageName: element.name,
-    //     pageAccessToken: element.access_token,
-    //     pageId: element.id,
-    //   };
-    // });
-    console.log(response);
-    setPages(response.data.pageArray);
+    if (response.status === "200") {
+      console.log(response);
+      setPages(response.data.pageArray);
+      if (response.data.pageArray.length === 0) {
+        toast.error("No pages found for this facebook id");
+      }
+    } else {
+      toast.error(response.message);
+    }
   };
   const handleFbLoginResponse = (response: any) => {
     console.log(response);
@@ -65,30 +77,35 @@ function LoginPage({
         userFbId: response.authResponse.userID,
         userId: userData.userId,
         accessToken: response.authResponse.accessToken,
-      }).then((response: any) => {
-        console.log(response);
+      }).then((response) => {
+        if (response.status === "200") {
+          toast.success(response.message);
+        } else {
+          toast.error(response.message);
+        }
       });
   };
 
   useEffect(() => {
     (window as any).FB?.getLoginStatus(function (response: any) {
-      console.log(response);
+      console.log("fb connection status", response);
     });
   });
 
+  function handleDelete(id: string): void {
+    deletePage(id).then((response) => {
+      if (response.status === "200") {
+        const updatedPageArray = pages.filter((page) => page._id !== id);
+        setPages(updatedPageArray);
+        toast.success(response.message);
+      } else {
+        toast.error(response.message);
+      }
+    });
+  }
+
   return (
-    <div
-      style={{
-        backgroundColor: "#1F4D90",
-        height: "100vh",
-        width: "100%",
-        textAlign: "center",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
+    <Page>
       {!logedIn && (
         <LoginComponent
           userData={userData}
@@ -106,11 +123,6 @@ function LoginPage({
               variant="contained"
               className="fb-login-button"
               data-width="100"
-              data-size=""
-              data-button-type=""
-              data-layout=""
-              data-auto-logout-link="false"
-              data-use-continue-as="false"
               onClick={() => {
                 (window as any).FB.login(handleFbLoginResponse, {
                   config_id: "458742549836535",
@@ -123,64 +135,12 @@ function LoginPage({
         </Modal>
       )}
 
-      {userStatus === "connected" && pages.length === 0 && (
-        <Modal>
-          <Button
-            onClick={async () => {
-              // (window as any).FB.api(
-              //   "/me/accounts",
-              //   "GET",
-              //   {},
-              //   function (response: any) {
-              //     handlePageResponse(response.data);
-              //   }
-              // );
-              if (userData.userId) {
-                const response = await getPages({ userId: userData.userId });
-                handlePageResponse(response);
-              }
-            }}
-          >
-            Get Pages
-          </Button>
-        </Modal>
-      )}
-
-      {pages.length !== 0 && (
-        <Modal>
-          <Typography fontWeight={600}>Facebook Page Integeration</Typography>
-          {pages.map((page) => (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "8px",
-                marginTop: "4px",
-              }}
-            >
-              <span>
-                Integrated Page:{" "}
-                <span style={{ fontWeight: "600" }}>{page.pageName}</span>{" "}
-              </span>
-              <Button
-                style={{ backgroundColor: "#E05140" }}
-                variant="contained"
-              >
-                Delete Integration
-              </Button>
-              <Button
-                variant="contained"
-                onClick={() => {
-                  setPageId(page._id);
-                }}
-              >
-                Reply to Messages
-              </Button>
-            </div>
-          ))}
-        </Modal>
-      )}
-    </div>
+      <GetPagesComponent
+        userData={userData}
+        setPageId={setPageId}
+        userStatus={userStatus}
+      />
+    </Page>
   );
 }
 
