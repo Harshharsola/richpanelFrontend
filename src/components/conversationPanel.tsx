@@ -21,41 +21,23 @@ const Header = styled.div`
   border-color: lightgray;
 `;
 
-const ConversationCard = styled.div`
+const ConversationCard = styled.div<{
+  $selected: boolean;
+}>`
   padding: 12px;
   border-bottom: 1px lightgray;
   border-bottom-style: solid;
+  background-color: ${(props) => (props.$selected ? "#edeeef" : "white")}
   &:hover {
     background-color: #edeeef;
     box-shadow: 2px 1px 5px gray;
   }
 `;
 
-const mockConversationArray = [
-  {
-    name: "Harsh harsola",
-    email: " Hi hello wassup",
-    recipientId: "12346i",
-  },
-  {
-    name: "Yamini harsola",
-    email: " Hi hello wassup",
-    recipientId: "asdf",
-  },
-  {
-    name: "Dk harsola",
-    email: " Hi hello wassup",
-    recipientId: "34",
-  },
-  {
-    name: "Shobhana harsola",
-    email: " Hi hello wassup",
-    recipientId: "jhgf",
-  },
-];
 function ConversationsPanel(props: {
   conversations: conversations[];
   setRecipientId: React.Dispatch<React.SetStateAction<number>>;
+  recipientId: number;
 }) {
   const handleConversationSelection = (index: number) => {
     props.setRecipientId(index);
@@ -70,6 +52,7 @@ function ConversationsPanel(props: {
       {props.conversations.map((chat, index) => {
         return (
           <ConversationCard
+            $selected={index === props.recipientId}
             key={chat.id}
             onClick={() => {
               handleConversationSelection(index);

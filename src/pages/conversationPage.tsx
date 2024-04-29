@@ -48,6 +48,7 @@ function ConversationPage(props: Iprops) {
       <Sidebar setSelectedPanel={setSelectedPanel} selected={selectedPanel} />
       {!loading && !noConversations && selectedPanel === "inbox" && (
         <ConversationsPanel
+          recipientId={recipientId}
           conversations={conversations}
           setRecipientId={setRecipientId}
         />
