@@ -15,7 +15,7 @@ export const signUpApi = async (payload: {
   };
 
   const response = await fetch(
-    "http://localhost:3000/users/signUp",
+    `${process.env.REACT_APP_API_URL}/users/signUp`,
     requestOptions
   );
 
@@ -35,7 +35,7 @@ export const logInApi = async (payload: {
   };
 
   const response = await fetch(
-    "http://localhost:3000/users/login",
+    `${process.env.REACT_APP_API_URL}/users/login`,
     requestOptions
   );
 
@@ -56,7 +56,7 @@ export const updateUserIdAndToken = async (payload: {
   };
 
   const response = await fetch(
-    "http://localhost:3000/users/add-id",
+    `${process.env.REACT_APP_API_URL}/users/add-id`,
     requestOptions
   );
 
@@ -65,10 +65,9 @@ export const updateUserIdAndToken = async (payload: {
 
 export const getPages = async (payload: { userId: string }) => {
   console.log(payload);
-  const raw = JSON.stringify(payload);
 
   const response = await fetch(
-    "http://localhost:3000/pages?id=" + payload.userId
+    `${process.env.REACT_APP_API_URL}/pages?id=` + payload.userId
   );
 
   return response.json();
@@ -76,7 +75,7 @@ export const getPages = async (payload: { userId: string }) => {
 
 export const connectPage = async () => {
   const response = await fetch(
-    "http://localhost:3000/conversations/connect-page"
+    `${process.env.REACT_APP_API_URL}/conversations/connect-page`
   );
 
   return response.json();
@@ -86,15 +85,18 @@ export const getConversations = async (payload: { pageId: string }) => {
   console.log(payload);
 
   const response = await fetch(
-    "http://localhost:3000/conversations?pageId=" + payload.pageId
+    `${process.env.REACT_APP_API_URL}/conversations?pageId=` + payload.pageId
   );
 
   return response.json();
 };
 
 export const deletePage = async (id: string) => {
-  const response = await fetch("http://localhost:3000/pages/delete?id=" + id, {
-    method: "DELETE",
-  });
+  const response = await fetch(
+    `${process.env.REACT_APP_API_URL}/pages/delete?id=` + id,
+    {
+      method: "DELETE",
+    }
+  );
   return response.json();
 };

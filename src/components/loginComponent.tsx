@@ -69,7 +69,7 @@ function LoginComponent(props: Iprops) {
 
     console.log(response);
     if (response) {
-      if (response.status === "200") {
+      if (response.status === "200" || response.status === "201") {
         props.setUserData({ ...userData, userId: response.data._id });
         props.setLoggedIn(true);
       } else {

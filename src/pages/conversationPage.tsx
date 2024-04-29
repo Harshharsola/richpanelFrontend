@@ -43,7 +43,6 @@ function ConversationPage(props: Iprops) {
     });
   }, []);
 
-  useEffect(() => {}, [recipientId]);
   return (
     <Page>
       <Sidebar setSelectedPanel={setSelectedPanel} selected={selectedPanel} />
