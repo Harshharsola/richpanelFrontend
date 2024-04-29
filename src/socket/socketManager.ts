@@ -7,7 +7,7 @@ class SocketManager {
 
   private constructor() {
     // Initialize the socket connection
-    this.socket = io("http://localhost:3000");
+    this.socket = io(`${process.env.REACT_APP_API_URL}`);
   }
 
   public static getInstance(): SocketManager {
