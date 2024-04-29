@@ -27,7 +27,7 @@ const ConversationCard = styled.div<{
   padding: 12px;
   border-bottom: 1px lightgray;
   border-bottom-style: solid;
-  background-color: ${(props) => (props.$selected ? "#edeeef" : "white")}
+  background-color: ${(props) => (props.$selected ? "#edeeef" : "white")};
   &:hover {
     background-color: #edeeef;
     box-shadow: 2px 1px 5px gray;
