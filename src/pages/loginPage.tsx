@@ -57,17 +57,7 @@ function LoginPage({
       _id: string;
     }[]
   >([]);
-  const handlePageResponse = (response: any) => {
-    if (response.status === "200") {
-      console.log(response);
-      setPages(response.data.pageArray);
-      if (response.data.pageArray.length === 0) {
-        toast.error("No pages found for this facebook id");
-      }
-    } else {
-      toast.error(response.message);
-    }
-  };
+
   const handleFbLoginResponse = (response: any) => {
     console.log(response);
     setAuthResponse(response.authResponse);
@@ -91,18 +81,6 @@ function LoginPage({
       console.log("fb connection status", response);
     });
   });
-
-  function handleDelete(id: string): void {
-    deletePage(id).then((response) => {
-      if (response.status === "200") {
-        const updatedPageArray = pages.filter((page) => page._id !== id);
-        setPages(updatedPageArray);
-        toast.success(response.message);
-      } else {
-        toast.error(response.message);
-      }
-    });
-  }
 
   return (
     <Page>

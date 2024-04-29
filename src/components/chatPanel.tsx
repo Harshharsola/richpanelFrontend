@@ -52,32 +52,6 @@ const Message = styled.div`
   box-shadow: 1px 1px 2px gray;
 `;
 
-const messages = [
-  { text: "hi hello", senderId: "234" },
-  { text: "hi hello", senderId: "234" },
-  { text: "hi hello", userId: "23" },
-  { text: "hi hello", userId: "23" },
-  { text: "hi hello", senderId: "234" },
-  { text: "hi hello", userId: "23" },
-  { text: "hi hello", senderId: "234" },
-  { text: "hi hello", senderId: "234" },
-  { text: "hi hello", userId: "23" },
-  { text: "hi hello", userId: "23" },
-  { text: "hi hello", senderId: "234" },
-  { text: "hi hello", userId: "23" },
-  { text: "hi hello", senderId: "234" },
-  { text: "hi hello", senderId: "234" },
-  { text: "hi hello", userId: "23" },
-  { text: "hi hello", userId: "23" },
-  { text: "hi hello", senderId: "234" },
-  { text: "hi hello", userId: "23" },
-  { text: "hi hello", senderId: "234" },
-  { text: "hi hello", senderId: "234" },
-  { text: "hi hello", userId: "23" },
-  { text: "hi hello", userId: "23" },
-  { text: "hi hello", senderId: "234" },
-  { text: "hi hello", userId: "23" },
-];
 function ChatPanel(props: {
   name: string;
   conversationId: string;
