@@ -1,10 +1,8 @@
 import styled from "@emotion/styled";
 import { Input, TextField, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import InboxIcon from "../assests/inbox.svg";
-import { io } from "socket.io-client";
 import SocketManager from "../socket/socketManager";
-// const socket = io("http://localhost:3000");
+import UserIcon from "../assests/user.svg";
 const Wrapper = styled.div`
   height: 100vh;
   background-color: #f6f6f7;
@@ -114,7 +112,7 @@ function ChatPanel(props: {
               $showImage={showImage}
               $messageType={message.senderId === props.pageId}
             >
-              {showImage && <InboxIcon />}{" "}
+              {showImage && <UserIcon height={22} width={18} />}{" "}
               <Message>{message.messageContent}</Message>
             </MessageComponent>
           );
