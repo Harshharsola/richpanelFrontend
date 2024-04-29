@@ -153,6 +153,7 @@ function LoginComponent(props: Iprops) {
             <input
               style={{ height: "30px" }}
               name="password"
+              type="password"
               onChange={handleInputChange}
             ></input>
           </div>
